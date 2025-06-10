@@ -77,6 +77,10 @@ export const signin = async (req, res) => {
 
 export const signout = async (req, res) => {
   try {
+    res.cookie("jwt", "", {
+      mawAge: 0,
+    });
+    res.status(200).json({message: "Déconnexion réussie."});
   } catch (error) {
     console.log("Signout error :", error);
     res.status(500);
