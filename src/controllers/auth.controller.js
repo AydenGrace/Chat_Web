@@ -86,3 +86,5 @@ export const signout = async (req, res) => {
     res.status(500);
   }
 };
+
+export const updateProfile = async (req, res) => {};
