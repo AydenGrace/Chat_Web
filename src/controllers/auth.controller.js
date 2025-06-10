@@ -1,3 +1,4 @@
+import cloudinary from "../lib/cloudinary.js";
 import {generateToken} from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
@@ -87,4 +88,34 @@ export const signout = async (req, res) => {
   }
 };
 
-export const updateProfile = async (req, res) => {};
+export const updateProfile = async (req, res) => {
+  try {
+    const {avatar} = req.body;
+    const userId = req.user._id;
+
+    if (!avatar)
+      return res.status(400).json({message: "Une image doit être fournie."});
+
+    if (!userId) return res.status(401).json({message: "utilisateur inconnu."});
+
+    const uploadResponse = await cloudinary.uploader.upload(avatar);
+
+    if (!uploadResponse.secure_url)
+      return res
+        .status(500)
+        .json({message: "Une erreur est survenue lors de l'upload."});
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        avatar: uploadResponse.secure_url,
+      },
+      {new: true}
+    );
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.log("updateProfile error :", error);
+    res.status(500);
+  }
+};
